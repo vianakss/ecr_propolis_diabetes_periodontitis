@@ -418,13 +418,13 @@ display "delta Control = " %4.2f `dc' "   90-day P = " %5.3f `p90' "   global P 
 restore
 }
 
-* 3.4. Heat maps of the overall P value across the grid of delta values
+* 3.4. Heat maps of the P value for the 90-day treatment effect across the grid of delta values (not affected by the equal fraction of missing information assumption)
 use "tipping_bacterial.dta", clear
 foreach y in log_fn log_so {
 local ttl = cond("`y'"=="log_fn", "{it:Fusobacterium nucleatum}", "{it:Streptococcus oralis}")
-twoway (contour p_global dt dc if outcome=="`y'", ccuts(0.01 0.05 0.10 0.20) ccolors("#541A2E" "#A0607A" "#E6E9EE" "#8A9BB5" "#384358") interp(none)) (scatteri 0 0, msymbol(X) mcolor(black) msize(large)), xlabel(-2(0.5)2) ylabel(-2(0.5)2, angle(0)) xtitle("Delta in the Control group (log10)") ytitle("Delta in the Test group (log10)") ztitle("Overall P value") title("`ttl'", size(medium)) legend(off) graphregion(color(white)) plotregion(color(white)) name(tp_`y', replace)
+twoway (contour p90 dt dc if outcome=="`y'", ccuts(0.01 0.05 0.10 0.20) ccolors("#541A2E" "#A0607A" "#E6E9EE" "#8A9BB5" "#384358") interp(none)) (scatteri 0 0, msymbol(X) mcolor(black) msize(large)), xlabel(-2(0.5)2) ylabel(-2(0.5)2, angle(0)) xtitle("Delta in the Control group (log10)") ytitle("Delta in the Test group (log10)") ztitle("P value, 90-day treatment effect") title("`ttl'", size(medium)) legend(off) graphregion(color(white)) plotregion(color(white)) name(tp_`y', replace)
 }
 graph combine tp_log_fn tp_log_so, rows(1) graphregion(color(white)) name(tipping_bacterial_panel, replace)
-graph export "tipping_bacterial_panel.png", name(tipping_bacterial_panel) width(3000) replace
+graph export "tipping_bacterial_panel_p90.png", name(tipping_bacterial_panel) width(3000) replace
 
 log close
