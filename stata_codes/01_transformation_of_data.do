@@ -52,7 +52,7 @@ graph combine box_`b'_raw box_`b'_log, cols(2) graphregion(color(white)) name(bo
 graph export "box_`b'.png", name(box_`b') width(3000) replace
 }
 
-* 1.6. Correlation matrices across assessment time points
+* 1.6. Scatterplot matrices of the repeated measurements across assessment time points (raw and log10 scales)
 foreach b in un pg fn so {
 preserve
 keep id group time `b'_count log_`b'
@@ -104,7 +104,7 @@ graph combine box_`b'_raw box_`b'_log, cols(2) graphregion(color(white)) name(bo
 graph export "box_`b'.png", name(box_`b') width(3000) replace
 }
 
-* 2.5. Correlation matrices across assessment time points
+* 2.6. Scatterplot matrices of the repeated measurements across assessment time points (raw and log10 scales)
 foreach b in il6 tnf {
 preserve
 keep id group time `b' log_`b'
@@ -160,7 +160,7 @@ graph combine box_`b'_raw box_`b'_log, cols(2) graphregion(color(white)) name(bo
 graph export "box_`b'.png", name(box_`b') width(3000) replace
 }
 
-* 3.5. Correlation matrices across assessment time points
+* 3.5. Scatterplot matrices of the repeated measurements across assessment time points (raw and log10 scales)
 foreach b in hba1c crp glucose {
 preserve
 keep id group time `b' log_`b'
