@@ -400,3 +400,38 @@ label values excl_id id
 list outcome excl_id est90 lb90 ub90 p90 p_global if p_global<0.05 & excl_id!=0, noobs
 restore
 log close
+
+
+
+
+log using "log_endpoint_feres.log", text replace
+
+*** 1. PROPORTION ACHIEVING THE ENDPOINT BY GROUP AND TIME
+foreach t in 0 1 2 {
+display as text _newline "Time `t'"
+tabulate group endpoint if time==`t', row exact
+}
+
+*** 2. RISK DIFFERENCE, RISK RATIO AND FISHER'S EXACT TEST AT 60 AND 90 DAYS (Test versus Control)
+foreach t in 1 2 {
+display as text _newline "Time `t'"
+cs endpoint group if time==`t', exact
+}
+
+*** 3. SENSITIVITY: WORST- AND BEST-CASE SCENARIOS FOR MISSING 90-DAY VALUES
+preserve
+keep if time==2
+count if missing(endpoint)
+generate byte worst = endpoint
+replace worst = 0 if missing(endpoint) & group==1
+replace worst = 1 if missing(endpoint) & group==0
+generate byte best = endpoint
+replace best = 1 if missing(endpoint) & group==1
+replace best = 0 if missing(endpoint) & group==0
+display as text _newline "Worst case for the Test group"
+cs worst group, exact
+display as text _newline "Best case for the Test group"
+cs best group, exact
+restore
+
+log close
