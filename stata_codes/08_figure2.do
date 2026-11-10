@@ -3,7 +3,7 @@
 *** FIGURE 3 - INDIVIDUAL TRAJECTORIES OF BACTERIAL COUNTS ***
 ********************************************************************************
 capture log close
-log using "log_figure3_bacterial_trajectories.log", text replace
+log using "log_figure2_bacterial_trajectories.log", text replace
 use "dataset_-_ecr_propolis_long.dta", clear
 xtset, clear
 
