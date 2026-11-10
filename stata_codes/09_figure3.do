@@ -3,7 +3,7 @@
 *** FIGURE 2 - FOREST PLOT OF THE 90-DAY TREATMENT EFFECTS ***
 ********************************************************************************
 capture log close
-log using "log_figure2_forest_plot.log", text replace
+log using "log_figure3_forest_plot.log", text replace
 
 * 1. Treatment effects at 90 days from the main analysis (panel 6 on the log10 scale)
 clear
