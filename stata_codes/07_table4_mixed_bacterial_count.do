@@ -6,6 +6,8 @@ capture log close
 log using "log_table_mixed_model_bacterial_counts.log", text replace
 xtset id time
 
+use "dataset_propolis_analysis.dta", clear
+
 *** 0. DATA PREPARATION AND MISSING DATA PATTERN ***
 * 0.1. Baseline values as covariates (log10 scale)
 capture drop log_un_base
