@@ -3,6 +3,7 @@ version 19.0
 capture log close
 log using "covariance_structure_selection.log", text replace
 
+use "dataset_propolis_analysis.dta", clear
 
 * 0. Design and variable checks
 isid id time
