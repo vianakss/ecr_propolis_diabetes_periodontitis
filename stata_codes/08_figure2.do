@@ -1,6 +1,6 @@
 
 ********************************************************************************
-*** FIGURE 3 - INDIVIDUAL TRAJECTORIES OF BACTERIAL COUNTS ***
+*** FIGURE 2 - INDIVIDUAL TRAJECTORIES OF BACTERIAL COUNTS ***
 ********************************************************************************
 capture log close
 log using "log_figure2_bacterial_trajectories.log", text replace
@@ -51,9 +51,9 @@ twoway (line `y' time if group==`g' & !miss90, connect(L) lcolor(gs11) lwidth(th
 
 * 5. Combined figure: bacteria in rows, groups in columns
 graph combine tr_log_un_0 tr_log_un_1 tr_log_pg_0 tr_log_pg_1 tr_log_fn_0 tr_log_fn_1 tr_log_so_0 tr_log_so_1, cols(2) xsize(10) ysize(14) imargin(small) graphregion(color(white)) name(figure3_trajectories, replace)
-graph export "figure3_bacterial_trajectories.png", name(figure3_trajectories) width(3000) replace
-graph export "figure3_bacterial_trajectories.tif", name(figure3_trajectories) width(3000) replace
-graph save figure3_trajectories "figure3_bacterial_trajectories.gph", replace
+graph export "figure2_bacterial_trajectories.png", name(figure2_trajectories) width(3000) replace
+graph export "figure2_bacterial_trajectories.tif", name(figure2_trajectories) width(3000) replace
+graph save figure2_trajectories "figure2_bacterial_trajectories.gph", replace
 
 
 
