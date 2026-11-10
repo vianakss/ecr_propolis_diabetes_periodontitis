@@ -1,2 +1,2 @@
-# ecr_propolis_diabetes_periodontitis
-Stata code to reproduce the analyses of "[Article Title]" ([Journal], [Year]). Cross-sectional study using NHANES [20XX–20XX] data on [exposure] and periodontitis.
+# Effect of the supplementation with green propolis on non-surgical periodontal treatment of individuals with type II diabetes: a randomized clinical trial
+Stata code to reproduce the analyses of "Effect of the supplementation with green propolis on non-surgical periodontal treatment of individuals with type II diabetes: a randomized clinical trial". Randomized Clinical Trial comprising data collection from November 2023 to January 2024.
