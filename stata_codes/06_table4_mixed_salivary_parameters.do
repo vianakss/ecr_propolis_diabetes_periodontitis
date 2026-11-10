@@ -5,6 +5,8 @@ capture log close
 log using "log_table_mixed_model_cytokines.log", text replace
 xtset id time
 
+use "dataset_propolis_analysis.dta", clear
+
 capture drop lab_bac miss90_bac
 bysort id: egen lab_bac = max(time==0 & !missing(log_un))
 bysort id: egen miss90_bac = max(time==2 & missing(log_un))
