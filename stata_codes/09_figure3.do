@@ -72,8 +72,8 @@ twoway (rcap lb ub row if panel==`p', horizontal lcolor("#5B6E8C") lwidth(medthi
 graph combine fp1 fp2, cols(1) imargin(small) graphregion(color(white)) name(fp_left, replace)
 graph combine fp3 fp4 fp5 fp6, cols(1) imargin(small) graphregion(color(white)) name(fp_right, replace)
 graph combine fp_left fp_right, cols(2) xsize(12) ysize(8) imargin(small) graphregion(color(white)) name(figure2_forest, replace)
-graph export "figure2_forest_plot.png", name(figure2_forest) width(3600) replace
-graph export "figure2_forest_plot.tif", name(figure2_forest) width(3600) replace
-graph save figure2_forest "figure2_forest_plot.gph", replace
+graph export "figure3_forest_plot.png", name(figure3_forest) width(3600) replace
+graph export "figure3_forest_plot.tif", name(figure3_forest) width(3600) replace
+graph save figure3_forest "figure3_forest_plot.gph", replace
 
 log close
