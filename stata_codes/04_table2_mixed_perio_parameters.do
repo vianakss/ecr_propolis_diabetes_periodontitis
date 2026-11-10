@@ -434,4 +434,28 @@ display as text _newline "Best case for the Test group"
 cs best group, exact
 restore
 
+*** 4. RISK DIFFERENCE WITH NEWCOMBE HYBRID SCORE CONFIDENCE INTERVALS (method 10)
+foreach t in 1 2 {
+quietly count if time==`t' & group==1 & !missing(endpoint)
+local n1 = r(N)
+quietly count if time==`t' & group==1 & endpoint==1
+local x1 = r(N)
+quietly count if time==`t' & group==0 & !missing(endpoint)
+local n0 = r(N)
+quietly count if time==`t' & group==0 & endpoint==1
+local x0 = r(N)
+quietly cii proportions `n1' `x1', wilson
+local p1 = r(proportion)
+local l1 = r(lb)
+local u1 = r(ub)
+quietly cii proportions `n0' `x0', wilson
+local p0 = r(proportion)
+local l0 = r(lb)
+local u0 = r(ub)
+local d = `p1' - `p0'
+local lo = `d' - sqrt((`p1'-`l1')^2 + (`u0'-`p0')^2)
+local hi = `d' + sqrt((`u1'-`p1')^2 + (`p0'-`l0')^2)
+display "Time `t': risk difference (Test-Control) = " %6.2f 100*`d' " [" %6.2f 100*`lo' "; " %6.2f 100*`hi' "] percentage points"
+}
+
 log close
