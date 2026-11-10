@@ -110,7 +110,7 @@ log close
 
 
 ********************************************************************************
-*** MULTIPLE IMPUTATION AND TIPPING-POINT ANALYSIS - PERIODONTAL PARAMETERS ***
+*** MULTIPLE IMPUTATION - PERIODONTAL PARAMETERS ***
 ********************************************************************************
 version 19
 set more off
@@ -199,55 +199,6 @@ display as text _newline "Adjusted means: `y' (baseline mean = " %9.4f `mb' ")"
 mi estimate (c60: [`y'1]_cons + [`y'1]`y'0*`mb') (t60: [`y'1]_cons + [`y'1]1.group + [`y'1]`y'0*`mb') (c90: [`y'2]_cons + [`y'2]`y'0*`mb') (t90: [`y'2]_cons + [`y'2]1.group + [`y'2]`y'0*`mb'), nocoef: mvreg `y'1 `y'2 = i.group `y'0
 }
 
-
-*** 3. TIPPING-POINT ANALYSIS OF THE PRIMARY OUTCOME (MEAN PROBING DEPTH) ***
-* 3.1. Shift of imputed 90-day values by delta (mm) in each group, from -1 to 1 in steps of 0.25
-capture postutil clear
-tempname tp
-postfile `tp' dc dt est90 lb90 ub90 p90 F p_global using "tipping_periodontal.dta", replace
-forvalues ic = -4/4 {
-forvalues it = -4/4 {
-local dc = `ic'/4
-local dt = `it'/4
-preserve
-quietly replace meanpd2 = meanpd2 + `dc' if _mi_m>0 & miss_meanpd2 & group==0
-quietly replace meanpd2 = meanpd2 + `dt' if _mi_m>0 & miss_meanpd2 & group==1
-quietly mi estimate: mvreg meanpd1 meanpd2 = i.group meanpd0
-matrix T = r(table)
-local c = colnumb(T, "meanpd2:1.group")
-local e90 = T[1,`c']
-local p90 = T[4,`c']
-local l90 = T[5,`c']
-local u90 = T[6,`c']
-quietly mi test [meanpd1]1.group [meanpd2]1.group
-post `tp' (`dc') (`dt') (`e90') (`l90') (`u90') (`p90') (r(F)) (r(p))
-restore
-}
-}
-postclose `tp'
-
-* 3.2. Results: scenario without adjustment, grid of global P values and heat map
-use "tipping_periodontal.dta", clear
-list est90 lb90 ub90 p90 F p_global if dc==0 & dt==0, noobs
-table (dc) (dt), statistic(mean p_global) nformat(%5.3f)
-summarize p_global
-twoway (contour p_global dt dc, ccuts(0.01 0.05 0.10 0.20) ccolors("#541A2E" "#A0607A" "#E6E9EE" "#8A9BB5" "#384358") interp(none)) (scatteri 0 0, msymbol(X) mcolor(black) msize(large)), xlabel(-1(0.25)1) ylabel(-1(0.25)1, angle(0)) xtitle("Delta in the Control group (mm)") ytitle("Delta in the Test group (mm)") ztitle("Overall P value") title("Mean probing depth", size(medium)) legend(off) graphregion(color(white)) plotregion(color(white)) name(tipping_meanpd, replace)
-graph export "tipping_meanpd.png", name(tipping_meanpd) width(3000) replace
-graph save tipping_meanpd "tipping_meanpd.gph", replace
-
-
-*** 4. CONFIRMATION WITH PREDICTIVE MEAN MATCHING FOR PERCENTAGE OUTCOMES (BOUNDED AT ZERO) ***
-* The imputed dataset is reloaded so that the stored multivariate normal imputations are not overwritten
-use "mi_periodontal.dta", clear
-local s = 20261301
-foreach y in plaque pctbop pctsite4mm pctsite5_6mm pctsite7plus {
-mi impute pmm `y'2 = i.group `y'0 `y'1, knn(5) replace rseed(`s')
-local s = `s' + 1
-mi estimate: mvreg `y'1 `y'2 = i.group `y'0
-mi test [`y'1]1.group [`y'2]1.group
-display "Global test `y' (predictive mean matching): F(" r(df) "; " %6.2f r(df_r) ") = " %5.2f r(F) ", P = " %5.3f r(p)
-}
-
 log close
 
 
@@ -282,7 +233,7 @@ foreach y in log_un log_pg log_fn log_so {
 assert !missing(`y'0, `y'1)
 }
 
-* 0.4. Indicators of originally missing 90-day values (used in the tipping-point analysis)
+* 0.4. Indicators of originally missing 90-day values (used in the diagnostics and in the tipping-point analysis)
 foreach y in log_un log_pg log_fn log_so {
 gen miss_`y'2 = missing(`y'2)
 }
@@ -339,46 +290,9 @@ mi estimate (c60: [`y'1]_cons + [`y'1]`y'0*`mb') (t60: [`y'1]_cons + [`y'1]1.gro
 }
 
 
-*** 3. TIPPING-POINT ANALYSIS (DELTA ADJUSTMENT) ***
-* 3.1. Shift of imputed 90-day values by delta (log10 units) in each group, from -2 to 2 in steps of 0.5
-capture postutil clear
-tempname tp
-postfile `tp' str8 outcome dc dt est90 lb90 ub90 p90 F p_global using "tipping_bacterial.dta", replace
-foreach y in log_fn log_so {
-forvalues ic = -4/4 {
-forvalues it = -4/4 {
-local dc = `ic'/2
-local dt = `it'/2
-preserve
-quietly replace `y'2 = `y'2 + `dc' if _mi_m>0 & miss_`y'2 & group==0
-quietly replace `y'2 = `y'2 + `dt' if _mi_m>0 & miss_`y'2 & group==1
-quietly mi estimate: mvreg `y'1 `y'2 = i.group `y'0
-matrix T = r(table)
-local c = colnumb(T, "`y'2:1.group")
-local e90 = T[1,`c']
-local p90 = T[4,`c']
-local l90 = T[5,`c']
-local u90 = T[6,`c']
-quietly mi test [`y'1]1.group [`y'2]1.group
-post `tp' ("`y'") (`dc') (`dt') (`e90') (`l90') (`u90') (`p90') (r(F)) (r(p))
-restore
-}
-}
-}
-postclose `tp'
-
-* 3.2. Results: scenario without adjustment and grids of P values (global test and 90-day contrast)
-preserve
-use "tipping_bacterial.dta", clear
-list outcome est90 lb90 ub90 p90 F p_global if dc==0 & dt==0, noobs
-table (dc) (dt) if outcome=="log_fn", statistic(mean p_global) nformat(%5.3f)
-table (dc) (dt) if outcome=="log_so", statistic(mean p_global) nformat(%5.3f)
-table (dc) (dt) if outcome=="log_fn", statistic(mean p90) nformat(%5.3f)
-table (dc) (dt) if outcome=="log_so", statistic(mean p90) nformat(%5.3f)
-restore
-
-* 3.3. Refined tipping point for F. nucleatum: delta in the Control group from 0 to 1 in steps of 0.05, no adjustment in the Test group
-* Reported for the 90-day contrast and for the global test with and without the equal fraction of missing information assumption
+*** 3. TIPPING-POINT ANALYSIS FOR F. NUCLEATUM (DELTA ADJUSTMENT) ***
+* 3.1. Shift of the imputed 90-day values in the Control group by delta, from 0 to 1 log10 in steps of 0.05, with no adjustment in the Test group
+* Reported for the 90-day treatment effect and for the global test with and without the equal fraction of missing information assumption
 use "mi_bacterial_counts.dta", clear
 forvalues ic = 0/20 {
 local dc = `ic'/20
@@ -394,14 +308,5 @@ quietly mi test [log_fn1]1.group [log_fn2]1.group, ufmitest
 display "delta Control = " %4.2f `dc' "   90-day P = " %5.3f `p90' "   global P (equal FMI) = " %5.3f `pe' "   global P (unrestricted FMI) = " %5.3f r(p)
 restore
 }
-
-* 3.4. Heat maps of the P value for the 90-day treatment effect across the grid of delta values (not affected by the equal fraction of missing information assumption)
-use "tipping_bacterial.dta", clear
-foreach y in log_fn log_so {
-local ttl = cond("`y'"=="log_fn", "{it:Fusobacterium nucleatum}", "{it:Streptococcus oralis}")
-twoway (contour p90 dt dc if outcome=="`y'", ccuts(0.01 0.05 0.10 0.20) ccolors("#541A2E" "#A0607A" "#E6E9EE" "#8A9BB5" "#384358") interp(none)) (scatteri 0 0, msymbol(X) mcolor(black) msize(large)), xlabel(-2(0.5)2) ylabel(-2(0.5)2, angle(0)) xtitle("Delta in the Control group (log10)") ytitle("Delta in the Test group (log10)") ztitle("P value, 90-day treatment effect") title("`ttl'", size(medium)) legend(off) graphregion(color(white)) plotregion(color(white)) name(tp_`y', replace)
-}
-graph combine tp_log_fn tp_log_so, rows(1) graphregion(color(white)) name(tipping_bacterial_panel, replace)
-graph export "tipping_bacterial_panel_p90.png", name(tipping_bacterial_panel) width(3000) replace
 
 log close
