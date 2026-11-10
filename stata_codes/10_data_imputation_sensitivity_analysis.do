@@ -4,6 +4,7 @@
 version 19
 set more off
 capture log close
+log using "log_mi_blood_chemistry.log", text replace
 use "dataset_-_ecr_propolis_long.dta", clear
 xtset, clear
 
