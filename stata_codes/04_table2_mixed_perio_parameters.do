@@ -4,9 +4,11 @@
 
 xtset id time
 
-*------------------------------------------------------------------------------*
+
 capture log close
 log using "log_table_mixed_model_periodontal_parameters.log", replace
+
+use "dataset_propolis_analysis.dta", clear
 
 *** 0. DATA PREPARATION AND MISSING DATA PATTERN ***
 * 0.1. Baseline values as covariates
