@@ -172,4 +172,6 @@ graph export "matrix_`b'.png", name(matrix_`b') width(3000) replace
 restore
 }
 
+save "dataset_propolis_analysis.dta", replace
+
 log close
