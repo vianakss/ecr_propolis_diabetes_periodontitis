@@ -5,6 +5,12 @@ capture log close
 log using "log_table_mixed_model_cytokines.log", text replace
 xtset id time
 
+capture drop lab_bac miss90_bac
+bysort id: egen lab_bac = max(time==0 & !missing(log_un))
+bysort id: egen miss90_bac = max(time==2 & missing(log_un))
+replace miss90_bac = 0 if !lab_bac
+count if miss90_bac & time==2 & !missing(il6)
+
 *** 0. DATA PREPARATION AND MISSING DATA PATTERN ***
 * 0.1. Baseline values as covariates
 capture drop il6_base
