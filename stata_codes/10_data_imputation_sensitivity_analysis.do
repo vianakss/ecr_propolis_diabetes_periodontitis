@@ -39,24 +39,12 @@ mi set flong
 mi register imputed hba1c1 hba1c2 glucose1 glucose2 log_crp1 log_crp2
 mi register regular hba1c0 glucose0 log_crp0
 
-* 1.2. Convergence of the data augmentation: worst linear function over 1,000 iterations
-foreach y in hba1c glucose log_crp {
-mi impute mvn `y'1 `y'2 = i.group `y'0, mcmconly burnin(1000) rseed(20261100) savewlf(wlf_`y', replace)
-preserve
-use wlf_`y', clear
-tsset iter
-tsline wlf, ytitle("Worst linear function") xtitle("Burn-in period") title("`y'", size(medium)) graphregion(color(white)) plotregion(color(white)) name(wlf_`y', replace)
-restore
-}
-graph combine wlf_hba1c wlf_glucose wlf_log_crp, rows(1) graphregion(color(white)) name(wlf_blood_panel, replace)
-graph export "wlf_blood_panel.png", name(wlf_blood_panel) width(3000) replace
-
-* 1.3. Multivariate normal imputation of 60- and 90-day values on group and baseline value (100 imputations)
+* 1.2. Multivariate normal imputation of 60- and 90-day values on group and baseline value (100 imputations)
 mi impute mvn hba1c1 hba1c2 = i.group hba1c0, add(100) rseed(20261101)
 mi impute mvn glucose1 glucose2 = i.group glucose0, replace rseed(20261102)
 mi impute mvn log_crp1 log_crp2 = i.group log_crp0, replace rseed(20261103)
 
-* 1.4. Diagnostics: observed versus imputed follow-up values by group
+* 1.3. Diagnostics: observed versus imputed follow-up values by group
 foreach y in hba1c glucose log_crp {
 foreach t in 1 2 {
 tabstat `y'`t' if _mi_m==0, by(group) statistics(n mean sd min max) nototal
@@ -64,7 +52,7 @@ capture noisily tabstat `y'`t' if _mi_m>0 & miss_`y'`t', by(group) statistics(n 
 }
 }
 
-* 1.5. Number of negative imputed values (raw-scale outcomes)
+* 1.4. Number of negative imputed values (raw-scale outcomes)
 foreach y in hba1c glucose {
 foreach t in 1 2 {
 quietly count if _mi_m>0 & miss_`y'`t'
@@ -74,7 +62,7 @@ display "`y'`t': " r(N) " negative values among " `n' " imputed values"
 }
 }
 
-* 1.6. Storage of the imputed dataset
+* 1.5. Storage of the imputed dataset
 save "mi_blood_chemistry.dta", replace
 
 
@@ -156,19 +144,7 @@ mi set flong
 mi register imputed plaque1 plaque2 pctbop1 pctbop2 meanpd1 meanpd2 meancal1 meancal2 pctsite4mm1 pctsite4mm2 pctsite5_6mm1 pctsite5_6mm2 pctsite7plus1 pctsite7plus2
 mi register regular plaque0 pctbop0 meanpd0 meancal0 pctsite4mm0 pctsite5_6mm0 pctsite7plus0
 
-* 1.2. Convergence of the data augmentation: worst linear function over 1,000 iterations
-foreach y in plaque pctbop meanpd meancal pctsite4mm pctsite5_6mm pctsite7plus {
-mi impute mvn `y'1 `y'2 = i.group `y'0, mcmconly burnin(1000) rseed(20261200) savewlf(wlf_`y', replace)
-preserve
-use wlf_`y', clear
-tsset iter
-tsline wlf, ytitle("Worst linear function") xtitle("Burn-in period") title("`y'", size(medium)) graphregion(color(white)) plotregion(color(white)) name(wlf_`y', replace)
-restore
-}
-graph combine wlf_plaque wlf_pctbop wlf_meanpd wlf_meancal wlf_pctsite4mm wlf_pctsite5_6mm wlf_pctsite7plus, cols(4) graphregion(color(white)) name(wlf_periodontal_panel, replace)
-graph export "wlf_periodontal_panel.png", name(wlf_periodontal_panel) width(3000) replace
-
-* 1.3. Multivariate normal imputation of 60- and 90-day values on group and baseline value (100 imputations)
+* 1.2. Multivariate normal imputation of 60- and 90-day values on group and baseline value (100 imputations)
 local opt "add(100)"
 local s = 20261201
 foreach y in plaque pctbop meanpd meancal pctsite4mm pctsite5_6mm pctsite7plus {
@@ -177,13 +153,13 @@ local opt "replace"
 local s = `s' + 1
 }
 
-* 1.4. Diagnostics: observed versus imputed 90-day values by group
+* 1.3. Diagnostics: observed versus imputed 90-day values by group
 foreach y in plaque pctbop meanpd meancal pctsite4mm pctsite5_6mm pctsite7plus {
 tabstat `y'2 if _mi_m==0, by(group) statistics(n mean sd min max) nototal
 capture noisily tabstat `y'2 if _mi_m>0 & miss_`y'2, by(group) statistics(n mean sd min max) nototal
 }
 
-* 1.5. Number of negative imputed values
+* 1.4. Number of negative imputed values
 foreach y in plaque pctbop meanpd meancal pctsite4mm pctsite5_6mm pctsite7plus {
 foreach t in 1 2 {
 quietly count if _mi_m>0 & miss_`y'`t'
@@ -193,7 +169,7 @@ display "`y'`t': " r(N) " negative values among " `n' " imputed values"
 }
 }
 
-* 1.6. Storage of the imputed dataset
+* 1.5. Storage of the imputed dataset
 save "mi_periodontal.dta", replace
 
 
